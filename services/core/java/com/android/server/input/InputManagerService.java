@@ -62,6 +62,7 @@ import android.media.AudioManager;
 import android.os.Binder;
 import android.os.CombinedVibration;
 import android.os.Environment;
+import android.os.FileObserver;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.IVibratorStateListener;
@@ -445,6 +446,19 @@ public class InputManagerService extends IInputManager.Stub
         }
     }
 
+    private class TscalObserver extends FileObserver {
+        public TscalObserver() {
+            super("/data/misc/tscal/pointercal", CLOSE_WRITE);
+        }
+
+        @Override
+        public void onEvent(int event, String path) {
+            Slog.i(TAG, "detect pointercal changed");
+            reloadDeviceAliases();
+        }
+    }
+    private final TscalObserver mTscalObserver = new TscalObserver();
+
     public InputManagerService(Context context) {
         this(new Injector(context, DisplayThread.get().getLooper(), new UEventManager() {}));
     }
@@ -485,6 +499,7 @@ public class InputManagerService extends IInputManager.Stub
                 NAMESPACE_INPUT_NATIVE_BOOT, VELOCITYTRACKER_STRATEGY_PROPERTY);
 
         injector.registerLocalService(new LocalService());
+        mTscalObserver.startWatching();
     }
 
     public void setWindowManagerCallbacks(WindowManagerCallbacks callbacks) {
