@@ -160,7 +160,8 @@ public class AndroidPackageUtils {
                 pkg.isMultiArch(),
                 pkg.isExtractNativeLibrariesRequested(),
                 pkg.isDebuggable(),
-                pkg.getPackageName()
+                pkg.getPackageName(),
+                NativeLibraryHelper.Handle.getApkDirFromCodePath(pkg.getPath())
         );
     }
 
