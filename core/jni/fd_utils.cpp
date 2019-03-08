@@ -271,6 +271,8 @@ std::unique_ptr<FileDescriptorInfo> FileDescriptorInfo::CreateFromFd(int fd, fai
     fail_fn(android::base::StringPrintf("Could not read fd link %s: %s",
                                         fd_path.c_str(),
                                         strerror(errno)));
+  } else if (android::base::StartsWith(file_path, "/android/")) {
+    file_path = file_path.substr(8);
   }
 
   if (!allowlist->IsAllowed(file_path)) {
