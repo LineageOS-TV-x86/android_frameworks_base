@@ -76692,6 +76692,10 @@ Lcom/android/internal/R$drawable;->decor_close_button_dark:I
 Lcom/android/internal/R$drawable;->decor_close_button_light:I
 Lcom/android/internal/R$drawable;->decor_maximize_button_dark:I
 Lcom/android/internal/R$drawable;->decor_maximize_button_light:I
+Lcom/android/internal/R$drawable;->decor_minimize_button_dark:I
+Lcom/android/internal/R$drawable;->decor_minimize_button_light:I
+Lcom/android/internal/R$drawable;->decor_pip_button_dark:I
+Lcom/android/internal/R$drawable;->decor_pip_button_light:I
 Lcom/android/internal/R$drawable;->default_lock_wallpaper:I
 Lcom/android/internal/R$drawable;->default_wallpaper:I
 Lcom/android/internal/R$drawable;->dialog_frame:I
