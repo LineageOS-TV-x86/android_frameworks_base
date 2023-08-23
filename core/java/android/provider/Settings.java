@@ -6218,6 +6218,10 @@ public final class Settings {
         public static final String VOLUME_KEY_CURSOR_CONTROL = "volume_key_cursor_control";
 
         /**
+         * @hide
+         */
+        public static final String ALERT_WINDOW_BYPASS_LOW_RAM = "alert_window_bypass_low_ram";
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate
