@@ -34,6 +34,7 @@ android_app {
     static_libs: [
         "services.core",
         "services.net",
+        "services.usb",
     ],
 
     libs: ["android.net.ipsec.ike.stubs.system"],

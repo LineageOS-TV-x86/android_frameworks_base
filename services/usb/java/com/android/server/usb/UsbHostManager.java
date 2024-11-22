@@ -70,6 +70,8 @@ public class UsbHostManager {
 
     // USB busses to exclude from USB host support
     private final String[] mHostDenyList;
+    // USB devices to exclude  from USB host support
+    private UsbDeviceDenyList mDeviceDenyList;
 
     private final UsbAlsaManager mUsbAlsaManager;
     private final UsbPermissionManager mPermissionManager;
@@ -248,6 +250,11 @@ public class UsbHostManager {
 
         mHostDenyList = context.getResources().getStringArray(
                 com.android.internal.R.array.config_usbHostDenylist);
+        mDeviceDenyList =
+                new UsbDeviceDenyList(
+                        context.getResources()
+                                .getStringArray(
+                                        com.android.internal.R.array.config_usbHostAppDenyList));
         mUsbAlsaManager = alsaManager;
         mPermissionManager = permissionManager;
         String deviceConnectionHandler = context.getResources().getString(
@@ -294,16 +301,20 @@ public class UsbHostManager {
     }
 
     /* returns true if the USB device should not be accessible by applications */
-    private boolean isDenyListed(int clazz, int subClass) {
+    private boolean isDenyListed(
+            int vendorId, int productId, int clazz, int subClass, int protocol) {
         // deny hubs and drives when booting in LIVE mode
         if (clazz == UsbConstants.USB_CLASS_HUB ||
 			(clazz == UsbConstants.USB_CLASS_MASS_STORAGE && SystemProperties.getBoolean("ro.boot.live", false)))
 		return true;
 
         // deny HID boot devices (mouse and keyboard)
-        return clazz == UsbConstants.USB_CLASS_HID
-                && subClass == UsbConstants.USB_INTERFACE_SUBCLASS_BOOT;
-
+        if (clazz == UsbConstants.USB_CLASS_HID
+                && subClass == UsbConstants.USB_INTERFACE_SUBCLASS_BOOT) {
+            return true;
+        }
+        // deny devices/interfaces denylisted by vendor
+        return mDeviceDenyList.isDenyListed(vendorId, productId, clazz, subClass, protocol);
     }
 
     private void addConnectionRecord(String deviceAddress, int mode, byte[] rawDescriptors) {
@@ -376,16 +387,21 @@ public class UsbHostManager {
             return false;
         }
 
-        if (isDenyListed(deviceClass, deviceSubclass)) {
+        UsbDescriptorParser parser = new UsbDescriptorParser(deviceAddress, descriptors);
+        UsbDeviceDescriptor deviceDescriptor = parser.getDeviceDescriptor();
+        int vendorId = deviceDescriptor.getVendorID();
+        int productId = deviceDescriptor.getProductID();
+        int protocol = deviceDescriptor.getProtocol();
+
+        if (isDenyListed(vendorId, productId, deviceClass, deviceSubclass, protocol)) {
             if (DEBUG) {
                 Slog.d(TAG, "device class is deny listed");
             }
             return false;
         }
 
-        UsbDescriptorParser parser = new UsbDescriptorParser(deviceAddress, descriptors);
         if (deviceClass == UsbConstants.USB_CLASS_PER_INTERFACE
-                && !checkUsbInterfacesDenyListed(parser)) {
+                && !checkUsbInterfacesDenyListed(vendorId, productId, parser)) {
             return false;
         }
 
@@ -624,7 +640,8 @@ public class UsbHostManager {
         }
     }
 
-    private boolean checkUsbInterfacesDenyListed(UsbDescriptorParser parser) {
+    private boolean checkUsbInterfacesDenyListed(
+            int vendorId, int productId, UsbDescriptorParser parser) {
         // Device class needs to be obtained through the device interface.  Ignore device only
         // if ALL interfaces are deny-listed.
         boolean shouldIgnoreDevice = false;
@@ -633,8 +650,14 @@ public class UsbHostManager {
                 continue;
             }
             UsbInterfaceDescriptor iface = (UsbInterfaceDescriptor) descriptor;
-            shouldIgnoreDevice = isDenyListed(iface.getUsbClass(), iface.getUsbSubclass());
-            if (!shouldIgnoreDevice) {
+            shouldIgnoreDevice =
+                    isDenyListed(
+                            vendorId,
+                            productId,
+                            iface.getUsbClass(),
+                            iface.getUsbSubclass(),
+                            iface.getProtocol());
+            if (shouldIgnoreDevice) {
                 break;
             }
         }

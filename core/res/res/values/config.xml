@@ -1331,6 +1331,23 @@
     <string-array name="config_usbHostDenylist" translatable="false">
     </string-array>
 
+    <!-- Filters for USB device IDs that won't be available to the apps using the USB host feature
+         Filter format:
+               vendorId:productId:class:subclass:protocol
+               vendorId:productId:class:subclass
+               vendorId:productId:class
+               vendorId:productId
+               vendorId
+         Every identifier is accepted in decimal format, like "123" or hex format like "0x1fa".
+         Also instead of any identifier a "match all" expression "*" or an empty string can be used.
+         Example usage:
+               0x1d6b - deny all USB devices with vendor ID = 0x1d6b
+               0x0f00:0x0b00 - deny the product 0x0b00 by vendor 0x0f00
+               *:*:0x3 - deny all devices of class 3 (HID) regardless of vendor and product
+    -->
+    <string-array name="config_usbHostAppDenyList">
+    </string-array>
+
     <!-- List of paths to serial ports that are available to the serial manager.
          for example, /dev/ttyUSB0
     -->
