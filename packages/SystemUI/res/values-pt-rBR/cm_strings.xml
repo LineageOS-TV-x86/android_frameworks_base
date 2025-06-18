@@ -68,10 +68,10 @@
     <string name="accessibility_dpad_left">Cursor à esquerda</string>
     <string name="accessibility_dpad_right">Cursor à direita</string>
     <string name="status_bar_firewall">Firewall</string>
-    <string name="screenshot_delete_label">Excluir</string>
-    <string name="screenshot_delete_description">Excluir captura de tela</string>
+    <string name="screenshot_delete_label">Apagar</string>
+    <string name="screenshot_delete_description">Apagar captura de tela</string>
     <string name="screenrecord_delete_label">Excluir</string>
-    <string name="screenrecord_delete_description">Gravação de tela excluída</string>
+    <string name="screenrecord_delete_description">Gravação de tela apagada</string>
     <string name="screenrecord_stopdot_label">Mostrar ponto de parar</string>
     <string name="screenrecord_stopdot_summary">Pressione e segure para movê-lo</string>
     <string name="screenrecord_lowquality_label">Baixa qualidade</string>
